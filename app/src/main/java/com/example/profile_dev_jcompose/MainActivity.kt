@@ -268,6 +268,42 @@ fun EnteteProfile(
 }
 
 @Composable
+fun InfoField(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},   // Lecture seule : aucune modification
+        readOnly = true,
+        singleLine = true,
+        label = { Text(text = label) },
+        leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun InfoField(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},
+        readOnly = true,
+        singleLine = true,
+        label = { Text(text = label) },
+        leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Composable
 fun ProjectCard(
     project: ProjectUi,
     modifier: Modifier = Modifier
