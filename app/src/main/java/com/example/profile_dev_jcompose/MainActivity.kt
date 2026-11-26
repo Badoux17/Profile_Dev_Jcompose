@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 // Composant EcranProfile
 @Composable
 fun EcranProfile(
@@ -58,7 +57,6 @@ fun EcranProfile(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        // Padding externe passé au composant enfant ProfileCard pour le décoller des bords de l'écran
         FicheProfile(
             name = name,
             role = role,
@@ -72,7 +70,6 @@ fun EcranProfile(
         )
     }
 }
-
 // Composant FicheProfile
 @Composable
 fun FicheProfile(
@@ -86,10 +83,7 @@ fun FicheProfile(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium
     ) {
-        // Padding interne (20.dp) appliqué à la colonne pour espacer le contenu à l'intérieur de la carte
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -98,7 +92,7 @@ fun FicheProfile(
             EntêteProfile(
                 name = name,
                 role = role,
-                modifier = Modifier.padding(bottom = 16.dp) // Padding externe
+                modifier = Modifier.padding(bottom = 16.dp)
             )
             InfoSecondaire(
                 statusText = availabilityText,
@@ -152,14 +146,12 @@ fun EntêteProfile(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = name,
-            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            fontSize = 20.sp,
         )
         Text(
             text = role,
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(top = 4.dp)
         )
     }
@@ -173,14 +165,7 @@ fun InfoSecondaire(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerColor = if (isAvailable) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        MaterialTheme.colorScheme.errorContainer
-    }
     Surface(
-        color = containerColor,
-        shape = MaterialTheme.shapes.small,
         modifier = modifier
             .fillMaxWidth()
             .semantics {
@@ -204,8 +189,7 @@ fun Competence(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surface,
-        shape = MaterialTheme.shapes.extraSmall,
+
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
