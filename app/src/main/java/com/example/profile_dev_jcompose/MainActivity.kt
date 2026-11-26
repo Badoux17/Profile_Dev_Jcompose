@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -266,7 +267,35 @@ fun EnteteProfile(
         }
     }
 }
+//Composant Card
+@Composable
+fun ContactCard(
+    email: String,
+    location: String,
+    availabilityText: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            InfoField(label = "Email", value = email, icon = Icons.Default.Email)
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoField(label = "Localisation", value = location, icon = Icons.Default.LocationOn)
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoField(label = "Disponibilité", value = availabilityText, icon = Icons.Default.DateRange)
+        }
+    }
+}
 
+//Composant InfoChamps
 @Composable
 fun InfoField(
     label: String,
@@ -285,24 +314,7 @@ fun InfoField(
     )
 }
 
-@Composable
-fun InfoField(
-    label: String,
-    value: String,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = {},
-        readOnly = true,
-        singleLine = true,
-        label = { Text(text = label) },
-        leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
-        modifier = modifier.fillMaxWidth()
-    )
-}
-
+//Composant Project Card
 @Composable
 fun ProjectCard(
     project: ProjectUi,
@@ -354,7 +366,7 @@ fun ProjectCard(
     }
 }
 
-
+//Composant Avatar
 @Composable
 fun AvatarAvecBadge(
     isAvailable: Boolean,
@@ -410,6 +422,7 @@ fun InfoSecondaire(
         )
     }
 }
+// Composant SkillChip
 @Composable
 fun SkillChip(
     label: String,
@@ -429,6 +442,7 @@ fun SkillChip(
     }
 }
 
+// Composant SkillLigne
 @Composable
 fun SkillRow(
     skills: List<String>,
@@ -444,6 +458,7 @@ fun SkillRow(
     }
 }
 
+// Composant Titre
 @Composable
 fun SectionTitle(
     text: String,
@@ -457,23 +472,6 @@ fun SectionTitle(
     )
 }
 
-// Composant Competence
-@Composable
-fun Competence(
-    skillName: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = "• $skillName",
-            fontSize = 14.sp,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        )
-    }
-}
 
 // Composant ActionButton
 @Composable
@@ -486,6 +484,8 @@ fun ActionButton(
         onClick = onClick,
         modifier = modifier.fillMaxWidth()
     ) {
+        Icon(imageVector = Icons.Default.Email, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = buttonText,
             modifier = Modifier.padding(vertical = 4.dp)
@@ -494,40 +494,32 @@ fun ActionButton(
 }
 
 // Preview 1
-@Preview(showBackground = true, name = "Profile Junior")
+@Preview(showBackground = true, name = "Profil - Light Theme")
 @Composable
-fun EcranProfilePreview1() {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            EcranProfile(
-                name = "Alice Martin",
-                role = "Développeuse Android Junior",
-                description = "Passionnée par le développement mobile",
-                skills = listOf("Kotlin", "Jetpack Compose", "Git", "Accessibilité"),
-                availabilityText = "Disponible pour un stage",
-                isAvailable = true,
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+fun EcranProfileLightPreview() {
+    Profile_dev_jcomposeTheme(darkTheme = false) {
+        EcranProfile(profile = sampleProfile(), onContactClick = {})
+    }
 }
-
 // Preview 2
-@Preview(showBackground = true, name = "Profile Senior")
+@Preview(showBackground = true, name = "Profil - Dark Theme")
 @Composable
-fun EcranProfilePreview2() {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            EcranProfile(
-                name = "Thomas Dubois",
-                role = "Développeur Full-Stack Senior",
-                description = "Spécialiste architecture cloud",
-                skills = listOf(
-                    "TypeScript",
-                    "Docker",
-                    "PostgreSQL",
-                    "CI/CD"
-                ),
+fun EcranProfileDarkPreview() {
+    Profile_dev_jcomposeTheme(darkTheme = true) {
+        EcranProfile(profile = sampleProfile(), onContactClick = {})
+    }
+}
+//Preview 3
+@Preview(showBackground = true, name = "Profil - Non disponible")
+@Composable
+fun EcranProfileIndisponiblePreview() {
+    Profile_dev_jcomposeTheme(darkTheme = false) {
+        EcranProfile(
+            profile = sampleProfile().copy(
                 availabilityText = "Non disponible",
-                isAvailable = false,
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+                isAvailable = false
+            ),
+            onContactClick = {}
+        )
+    }
 }
