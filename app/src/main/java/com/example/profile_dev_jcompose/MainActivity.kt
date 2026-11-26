@@ -231,22 +231,68 @@ fun FicheProfile(
 
 // Composant EntêteProfile
 @Composable
-fun EntêteProfile(
+fun EnteteProfile(
     name: String,
     role: String,
+    isAvailable: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = name,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AvatarAvecBadge(isAvailable = isAvailable)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = role,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun AvatarAvecBadge(
+    isAvailable: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        Image(
+            imageVector = Icons.Default.Person,
+            contentDescription = "Avatar du développeur",
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+            modifier = Modifier
+                .size(96.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
         )
-        Text(
-            text = role,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 4.dp)
-        )
+        // Badge superposé en bas à droite de l'avatar
+        Surface(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Icon(
+                imageVector = if (isAvailable) Icons.Default.CheckCircle else Icons.Default.Close,
+                contentDescription = if (isAvailable) "Disponible" else "Non disponible",
+                tint = if (isAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(28.dp)
+            )
+        }
     }
 }
 
