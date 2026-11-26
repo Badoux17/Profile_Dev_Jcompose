@@ -10,19 +10,36 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -167,6 +184,24 @@ fun EcranProfile(
         }
     }
 }
+//Composable Competence
+@Composable
+fun Competence(
+    skillName: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.extraSmall,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "• $skillName",
+            fontSize = 14.sp,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        )
+    }
+}
 // Composant FicheProfile
 @Composable
 fun FicheProfile(
@@ -186,10 +221,11 @@ fun FicheProfile(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            EntêteProfile(
+            EnteteProfile(
                 name = name,
                 role = role,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
+                isAvailable = true
             )
             InfoSecondaire(
                 statusText = availabilityText,
@@ -250,8 +286,7 @@ fun EnteteProfile(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(24.dp)
         ) {
             AvatarAvecBadge(isAvailable = isAvailable)
             Spacer(modifier = Modifier.height(16.dp))
@@ -331,18 +366,19 @@ fun ProjectCard(
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     imageVector = Icons.Default.Build,
-                    contentDescription = null,
+                    contentDescription = "Projet",
                     tint = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = project.title,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f)
                 )
                 Text(
                     text = project.year,
@@ -372,31 +408,36 @@ fun AvatarAvecBadge(
     isAvailable: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        Image(
-            imageVector = Icons.Default.Person,
-            contentDescription = "Avatar du développeur",
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-            modifier = Modifier
-                .size(96.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp)
-        )
+    Box(modifier = modifier.fillMaxWidth()) {
         Surface(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            shape = CircleShape,
+            shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surface
         ) {
-            Icon(
-                imageVector = if (isAvailable) Icons.Default.CheckCircle else Icons.Default.Close,
-                contentDescription = if (isAvailable) "Disponible" else "Non disponible",
-                tint = if (isAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(28.dp)
+            Image(
+                painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                contentDescription = "Avatar du développeur",
+                modifier = Modifier
+                    .size(96.dp)
+                    .padding(16.dp)
+            )
+        }
+        Surface(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp),
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        ) {
+            Text(
+                text = if (isAvailable) "Disponible" else "Indisponible",
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelMedium
             )
         }
     }
 }
+
 
 // Composant InfoSecondaire
 @Composable
