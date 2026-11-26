@@ -62,6 +62,47 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+fun sampleProjects(): List<ProjectUi> {
+    return listOf(
+        ProjectUi(
+            id = 1,
+            title = "Profile Dev",
+            description = "Application Android de présentation d'un profil développeur.",
+            technologies = "Kotlin • Jetpack Compose • Material 3",
+            year = "2026"
+        ),
+        ProjectUi(
+            id = 2,
+            title = "API de gestion de tâches",
+            description = "API REST permettant de créer, modifier et suivre des tâches.",
+            technologies = "Java • Spring Boot • PostgreSQL",
+            year = "2025"
+        ),
+        ProjectUi(
+            id = 3,
+            title = "Script d'analyse de logs",
+            description = "Outil en ligne de commande qui résume les erreurs d'un serveur.",
+            technologies = "Python • Git",
+            year = "2025"
+        )
+    )
+}
+
+fun sampleProfile(): ProfileUi {
+    return ProfileUi(
+        name = "Léo Piton",
+        role = "Développeur fullstack",
+        description = "Passionné par l'architecture logicielle depuis mes 5 ans...",
+        skills = listOf("Kotlin", "Jetpack Compose", "Git", "Java", "Python"),
+        projects = sampleProjects(),
+        email = "leo.piton@example.com",
+        location = "Paris, France",
+        availabilityText = "Stage de 4 à 6 mois",
+        isAvailable = true
+    )
+}
+
 // Composant EcranProfile
 @Composable
 fun EcranProfile(
