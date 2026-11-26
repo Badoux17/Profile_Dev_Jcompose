@@ -24,6 +24,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+data class ProjectUi(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val technologies: String,
+    val year: String
+)
+
+data class ProfileUi(
+    val name: String,
+    val role: String,
+    val description: String,
+    val skills: List<String>,
+    val projects: List<ProjectUi>,
+    val email: String,
+    val location: String,
+    val availabilityText: String,
+    val isAvailable: Boolean
+)
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
