@@ -3,11 +3,15 @@ package com.example.profile_dev_jcompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -23,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.profile_dev_jcompose.ui.theme.Profile_dev_jcomposeTheme
 
 data class ProjectUi(
     val id: Int,
@@ -48,16 +53,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            Profile_dev_jcomposeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     EcranProfile(
-                        name = "Léo Piton",
-                        role = "Développeur fullstack",
-                        description = "Passionnée l'architecture logiciel depuis mes 5 ans...",
-                        skills = listOf("Kotlin", "Jetpack Compose", "Git", "Java", "Python"),
-                        availabilityText = "Disponible pour un stage (4 à 6 mois)",
-                        isAvailable = true,
+                        profile = sampleProfile(),
+                        onContactClick = {
+                            // Pas de fonctionnement décidé
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
+                }
             }
         }
     }
@@ -106,29 +111,56 @@ fun sampleProfile(): ProfileUi {
 // Composant EcranProfile
 @Composable
 fun EcranProfile(
-    name: String,
-    role: String,
-    description: String,
-    skills: List<String>,
-    availabilityText: String,
-    isAvailable: Boolean,
+    profile: ProfileUi,
+    onContactClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        FicheProfile(
-            name = name,
-            role = role,
-            description = description,
-            skills = skills,
-            availabilityText = availabilityText,
-            isAvailable = isAvailable,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
+        item {
+            EnteteProfile(
+                name = profile.name,
+                role = profile.role,
+                isAvailable = profile.isAvailable
+            )
+        }
+        item { SectionTitle(text = "À propos") }
+        item {
+            Text(
+                text = profile.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+        item { SectionTitle(text = "Compétences") }
+        item { SkillRow(skills = profile.skills) }
+
+        item { SectionTitle(text = "Projets") }
+        items(
+            items = profile.projects,
+            key = { project -> project.id }
+        ) { project ->
+            ProjectCard(project = project)
+        }
+        item { SectionTitle(text = "Contact") }
+        item {
+            ContactCard(
+                email = profile.email,
+                location = profile.location,
+                availabilityText = profile.availabilityText
+            )
+        }
+        item {
+            ActionButton(
+                buttonText = "Contacter le profil",
+                onClick = onContactClick
+            )
+        }
     }
 }
 // Composant FicheProfile
