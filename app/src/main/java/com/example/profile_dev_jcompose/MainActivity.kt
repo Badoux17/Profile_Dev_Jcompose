@@ -87,8 +87,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Profile_dev_jcomposeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    EcranProfile(
-                        profile = sampleProfile(),
+                    ProfileContainer(
                         onContactClick = {
                             // Pas de fonctionnement décidé
                         },
@@ -216,6 +215,27 @@ fun onFavoriteClick(projectId: Int) {
         )
     }
 }
+
+@Composable
+fun ProfileContainer(
+    onContactClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    EcranProfile(
+        profile = uiState.profile,
+        projects = uiState.projects,
+        searchQuery = uiState.searchQuery,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
+        showOnlyFavorites = uiState.showOnlyFavorites,
+        onToggleFavoritesFilter = viewModel::onToggleFavoritesFilter,
+        favoriteProjectIds = uiState.favoriteProjectIds,
+        onFavoriteClick = viewModel::onFavoriteClick,
+        onContactClick = onContactClick,
+        modifier = modifier
+    )
 }
 
 
@@ -223,6 +243,13 @@ fun onFavoriteClick(projectId: Int) {
 @Composable
 fun EcranProfile(
     profile: ProfileUi,
+    projects: List<ProjectUi>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    showOnlyFavorites: Boolean,
+    onToggleFavoritesFilter: () -> Unit,
+    favoriteProjectIds: List<Int>,
+    onFavoriteClick: (Int) -> Unit,
     onContactClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -240,6 +267,7 @@ fun EcranProfile(
                 isAvailable = profile.isAvailable
             )
         }
+
         item { SectionTitle(text = "À propos") }
         item {
             Text(
@@ -248,24 +276,71 @@ fun EcranProfile(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
+
         item { SectionTitle(text = "Compétences") }
         item { SkillRow(skills = profile.skills) }
 
         item { SectionTitle(text = "Projets") }
+
+        item {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                label = {
+                    Text(text = "Rechercher un projet ou une technologie")
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Button(
+                onClick = onToggleFavoritesFilter
+            ) {
+                Text(
+                    text = if (showOnlyFavorites) {
+                        "Afficher tous les projets"
+                    } else {
+                        "Afficher uniquement les favoris"
+                    }
+                )
+            }
+        }
+
+        item {
+            Text(
+                text = if (projects.size <= 1) {
+                    "${projects.size} projet affiché"
+                } else {
+                    "${projects.size} projets affichés"
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
         items(
-            items = profile.projects,
+            items = projects,
             key = { project -> project.id }
         ) { project ->
-            ProjectCard(project = project)
+            ProjectCard(
+                project = project,
+                isFavorite = favoriteProjectIds.contains(project.id),
+                onFavoriteClick = {
+                    onFavoriteClick(project.id)
+                }
+            )
         }
+
         item { SectionTitle(text = "Contact") }
         item {
-            ContactCard(
+            ContactSection(
                 email = profile.email,
                 location = profile.location,
                 availabilityText = profile.availabilityText
             )
         }
+
         item {
             ActionButton(
                 buttonText = "Contacter le profil",
