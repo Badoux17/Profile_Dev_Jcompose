@@ -9,3 +9,10 @@ Le thème définit une palette claire et une palette sombre, des formes arrondie
 Par rapport à la première version, le thème est maintenant bien appliqué, la disponibilité est réellement utilisée, les tailles de texte codées en dur ont été remplacées par celles du thème, et les listes passent par des composants Lazy.
 
 Les icônes nécessitent la dépendance material-icons-extended, ajoutée comme au TP4.
+
+
+<img width="749" height="625" alt="image" src="https://github.com/user-attachments/assets/2763ecc5-5472-4b8b-9e93-2359d432bdad" />
+<img width="749" height="625" alt="image" src="https://github.com/user-attachments/assets/4df15e90-b87a-4372-86f3-d00b21d990a2" />
+
+Piton Léo M1AL
+
