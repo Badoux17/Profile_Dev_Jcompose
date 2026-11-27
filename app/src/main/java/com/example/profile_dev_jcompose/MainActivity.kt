@@ -49,6 +49,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.profile_dev_jcompose.ui.theme.Profile_dev_jcomposeTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class ProjectUi(
     val id: Int,
@@ -67,6 +71,14 @@ data class ProfileUi(
     val location: String,
     val availabilityText: String,
     val isAvailable: Boolean
+)
+
+data class ProfileUiState(
+    val profile: ProfileUi = sampleProfile(),
+    val projects: List<ProjectUi> = emptyList(),
+    val searchQuery: String = "",
+    val showOnlyFavorites: Boolean = false,
+    val favoriteProjectIds: List<Int> = emptyList()
 )
 
 class MainActivity : ComponentActivity() {
@@ -126,13 +138,86 @@ fun sampleProfile(): ProfileUi {
         role = "Développeur fullstack",
         description = "Passionné par l'architecture logicielle depuis mes 5 ans...",
         skills = listOf("Kotlin", "Jetpack Compose", "Git", "Java", "Python"),
-        projects = sampleProjects(),
         email = "leo.piton@example.com",
         location = "Paris, France",
         availabilityText = "Stage de 4 à 6 mois",
         isAvailable = true
     )
 }
+
+private val allProjects: List<ProjectUi> = sampleProjects()
+
+private val _uiState = MutableStateFlow(
+    ProfileUiState(
+        projects = allProjects
+    )
+)
+
+val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+private fun filterProjects(
+    searchQuery: String,
+    showOnlyFavorites: Boolean,
+    favoriteProjectIds: List<Int>
+): List<ProjectUi> {
+    return allProjects.filter { project ->
+        val matchesSearch =
+            project.title.contains(searchQuery, ignoreCase = true) ||
+                    project.technologies.contains(searchQuery, ignoreCase = true) ||
+                    project.description.contains(searchQuery, ignoreCase = true)
+        val matchesFavorites =
+            !showOnlyFavorites || favoriteProjectIds.contains(project.id)
+        matchesSearch && matchesFavorites
+    }
+}
+
+fun onSearchQueryChange(newValue: String) {
+    _uiState.update { currentState ->
+        currentState.copy(
+            searchQuery = newValue,
+            projects = filterProjects(
+                searchQuery = newValue,
+                showOnlyFavorites = currentState.showOnlyFavorites,
+                favoriteProjectIds = currentState.favoriteProjectIds
+            )
+        )
+    }
+}
+
+fun onToggleFavoritesFilter() {
+    _uiState.update { currentState ->
+        val newShowOnlyFavorites = !currentState.showOnlyFavorites
+
+        currentState.copy(
+            showOnlyFavorites = newShowOnlyFavorites,
+            projects = filterProjects(
+                searchQuery = currentState.searchQuery,
+                showOnlyFavorites = newShowOnlyFavorites,
+                favoriteProjectIds = currentState.favoriteProjectIds
+            )
+        )
+    }
+}
+
+fun onFavoriteClick(projectId: Int) {
+    _uiState.update { currentState ->
+        val newFavoriteIds =
+            if (currentState.favoriteProjectIds.contains(projectId)) {
+                currentState.favoriteProjectIds - projectId
+            } else {
+                currentState.favoriteProjectIds + projectId
+            }
+        currentState.copy(
+            favoriteProjectIds = newFavoriteIds,
+            projects = filterProjects(
+                searchQuery = currentState.searchQuery,
+                showOnlyFavorites = currentState.showOnlyFavorites,
+                favoriteProjectIds = newFavoriteIds
+            )
+        )
+    }
+}
+}
+
 
 // Composant EcranProfile
 @Composable
