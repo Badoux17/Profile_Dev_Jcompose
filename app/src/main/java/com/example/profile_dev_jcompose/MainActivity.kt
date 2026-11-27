@@ -63,7 +63,6 @@ data class ProfileUi(
     val role: String,
     val description: String,
     val skills: List<String>,
-    val projects: List<ProjectUi>,
     val email: String,
     val location: String,
     val availabilityText: String,
@@ -111,10 +110,16 @@ fun sampleProjects(): List<ProjectUi> {
             description = "Outil en ligne de commande qui résume les erreurs d'un serveur.",
             technologies = "Python • Git",
             year = "2025"
+        ),
+        ProjectUi(
+            id = 4,
+            title = "Application de notes",
+            description = "Petite application mobile pour écrire et classer des notes.",
+            technologies = "Kotlin • Jetpack Compose",
+            year = "2024"
         )
     )
 }
-
 fun sampleProfile(): ProfileUi {
     return ProfileUi(
         name = "Léo Piton",
