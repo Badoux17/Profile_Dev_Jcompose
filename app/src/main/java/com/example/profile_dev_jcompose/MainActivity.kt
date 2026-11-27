@@ -36,6 +36,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -48,6 +53,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.profile_dev_jcompose.ui.theme.Profile_dev_jcomposeTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -213,6 +220,74 @@ fun onFavoriteClick(projectId: Int) {
                 favoriteProjectIds = newFavoriteIds
             )
         )
+    }
+}
+class ProfileViewModel : ViewModel() {
+    private val allProjects: List<ProjectUi> = sampleProjects()
+    private val _uiState = MutableStateFlow(
+        ProfileUiState(
+            projects = allProjects
+        )
+    )
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    private fun filterProjects(
+        searchQuery: String,
+        showOnlyFavorites: Boolean,
+        favoriteProjectIds: List<Int>
+    ): List<ProjectUi> {
+        return allProjects.filter { project ->
+            val matchesSearch =
+                project.title.contains(searchQuery, ignoreCase = true) ||
+                        project.technologies.contains(searchQuery, ignoreCase = true) ||
+                        project.description.contains(searchQuery, ignoreCase = true)
+            val matchesFavorites =
+                !showOnlyFavorites || favoriteProjectIds.contains(project.id)
+            matchesSearch && matchesFavorites
+        }
+    }
+    fun onSearchQueryChange(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                searchQuery = newValue,
+                projects = filterProjects(
+                    searchQuery = newValue,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProjectIds = currentState.favoriteProjectIds
+                )
+            )
+        }
+    }
+    fun onToggleFavoritesFilter() {
+        _uiState.update { currentState ->
+            val newShowOnlyFavorites = !currentState.showOnlyFavorites
+
+            currentState.copy(
+                showOnlyFavorites = newShowOnlyFavorites,
+                projects = filterProjects(
+                    searchQuery = currentState.searchQuery,
+                    showOnlyFavorites = newShowOnlyFavorites,
+                    favoriteProjectIds = currentState.favoriteProjectIds
+                )
+            )
+        }
+    }
+    fun onFavoriteClick(projectId: Int) {
+        _uiState.update { currentState ->
+            val newFavoriteIds =
+                if (currentState.favoriteProjectIds.contains(projectId)) {
+                    currentState.favoriteProjectIds - projectId
+                } else {
+                    currentState.favoriteProjectIds + projectId
+                }
+            currentState.copy(
+                favoriteProjectIds = newFavoriteIds,
+                projects = filterProjects(
+                    searchQuery = currentState.searchQuery,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProjectIds = newFavoriteIds
+                )
+            )
+        }
     }
 }
 
@@ -518,6 +593,8 @@ fun InfoField(
 @Composable
 fun ProjectCard(
     project: ProjectUi,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -562,6 +639,52 @@ fun ProjectCard(
                 text = project.technologies,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = onFavoriteClick) {
+                Text(
+                    text = if (isFavorite) {
+                        "Retirer des favoris"
+                    } else {
+                        "Ajouter aux favoris"
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ContactSection(
+    email: String,
+    location: String,
+    availabilityText: String,
+    modifier: Modifier = Modifier
+) {
+    var showContact by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                showContact = !showContact
+            }
+        ) {
+            Text(
+                text = if (showContact) {
+                    "Masquer les coordonnées"
+                } else {
+                    "Afficher les coordonnées"
+                }
+            )
+        }
+        if (showContact) {
+            Spacer(modifier = Modifier.height(8.dp))
+            ContactCard(
+                email = email,
+                location = location,
+                availabilityText = availabilityText
             )
         }
     }
@@ -700,23 +823,59 @@ fun ActionButton(
 }
 
 // Preview 1
-@Preview(showBackground = true, name = "Profil - Light Theme")
+@Preview(
+    showBackground = true,
+    name = "Profil - Light Theme"
+)
 @Composable
 fun EcranProfileLightPreview() {
     Profile_dev_jcomposeTheme(darkTheme = false) {
-        EcranProfile(profile = sampleProfile(), onContactClick = {})
+        EcranProfile(
+            profile = sampleProfile(),
+            projects = sampleProjects(),
+            searchQuery = "",
+            onSearchQueryChange = {},
+            showOnlyFavorites = false,
+            onToggleFavoritesFilter = {},
+            favoriteProjectIds = emptyList(),
+            onFavoriteClick = {},
+            onContactClick = {}
+        )
     }
 }
 // Preview 2
-@Preview(showBackground = true, name = "Profil - Dark Theme")
+@Preview(
+    showBackground = true,
+    name = "Profil - Dark Theme"
+)
 @Composable
 fun EcranProfileDarkPreview() {
+    val searchQuery = "Kotlin"
+    val favoriteProjectIds = listOf(1, 3, 4)
+
     Profile_dev_jcomposeTheme(darkTheme = true) {
-        EcranProfile(profile = sampleProfile(), onContactClick = {})
+        EcranProfile(
+            profile = sampleProfile(),
+            projects = sampleProjects().filter { project ->
+                favoriteProjectIds.contains(project.id) &&
+                        project.technologies.contains(searchQuery, ignoreCase = true)
+            },
+            searchQuery = searchQuery,
+            onSearchQueryChange = {},
+            showOnlyFavorites = true,
+            onToggleFavoritesFilter = {},
+            favoriteProjectIds = favoriteProjectIds,
+            onFavoriteClick = {},
+            onContactClick = {}
+        )
     }
 }
-//Preview 3
-@Preview(showBackground = true, name = "Profil - Non disponible")
+
+// Preview 3
+@Preview(
+    showBackground = true,
+    name = "Profil - Non disponible"
+)
 @Composable
 fun EcranProfileIndisponiblePreview() {
     Profile_dev_jcomposeTheme(darkTheme = false) {
@@ -725,6 +884,13 @@ fun EcranProfileIndisponiblePreview() {
                 availabilityText = "Non disponible",
                 isAvailable = false
             ),
+            projects = emptyList(),
+            searchQuery = "Swift",
+            onSearchQueryChange = {},
+            showOnlyFavorites = false,
+            onToggleFavoritesFilter = {},
+            favoriteProjectIds = emptyList(),
+            onFavoriteClick = {},
             onContactClick = {}
         )
     }
