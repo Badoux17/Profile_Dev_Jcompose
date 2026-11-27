@@ -11,3 +11,10 @@ ProfileContainer relie le ViewModel à Compose : il récupère le ViewModel, col
 Trois previews utilisent directement l'écran stateless, sans ViewModel : une preview claire avec tous les projets et aucun favori, une preview sombre avec une recherche active et le filtre favoris activé, et une preview avec un profil non disponible et une recherche sans résultat.
 
 Le projet nécessite les dépendances material-icons-extended et lifecycle-viewmodel-compose.
+
+<img width="557" height="618" alt="image" src="https://github.com/user-attachments/assets/352cebdc-0231-4f5e-af29-dad8a17c3ea5" />
+<img width="557" height="721" alt="image" src="https://github.com/user-attachments/assets/4a10426f-e5a9-4f3e-b907-ca52cc6605e5" />
+
+Piton Léo M1 AL
+
+
